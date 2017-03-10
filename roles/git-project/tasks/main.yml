@@ -1,0 +1,13 @@
+- name: Create repo dest directory
+  file: dest={{ git_repo_dest }} state=directory owner=ubuntu group=ubuntu recurse=true mode=0755
+
+- name: "Clone or fetch git project"
+  git:
+    repo: "{{git_repo_address}}"
+    dest: "{{git_repo_dest}}"
+    version: "{{git_branch_name}}"
+    accept_hostkey: yes
+    force: yes
+  register: git_project
+  tags:
+    - deploy

@@ -1,0 +1,14 @@
+# OS Specific
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+venv/
+
+# IDE
+.idea/
+
+# Ansible
+*.retry-files/
+.ansible-roles/

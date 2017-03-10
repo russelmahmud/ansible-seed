@@ -1,0 +1,53 @@
+user www-data;
+worker_processes {{ nginx_worker_processes }};
+worker_rlimit_nofile {{ worker_rlimit_nofile|default(1000) }};
+pid /var/run/nginx.pid;
+
+events {
+        worker_connections {{ nginx_worker_connections }};
+        multi_accept on;
+}
+
+http {
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout {{ nginx_keepalive_timeout }};
+        types_hash_max_size 2048;
+        include mime.types;
+        default_type application/octet-stream;
+
+        {% if nginx_proxied is defined %}
+        set_real_ip_from 0.0.0.0/0; # To enable client IP logging
+        real_ip_header X-Forwarded-For; # Header that Varnish/Proxy set
+        
+        log_format varnish_log '$remote_addr - $remote_user [$time_local] '
+                        '"$host" "$request" $status $request_time $body_bytes_sent '
+                        '"$http_referer" "$http_user_agent" "$http_x_forwarded_for"';
+        {% else %}
+        log_format detailed '$remote_addr - $remote_user [$time_local] '
+                '"$host" "$request" $status $request_time $body_bytes_sent '
+                '"$http_referer" "$http_user_agent" "$http_x_forwarded_for"';
+        {% endif %}
+        
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+
+        # Gzip Settings
+        gzip {{ gzip }};
+        gzip_disable "msie6";
+
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_buffers 16 8k;
+        gzip_min_length  1000;
+        gzip_types text/html text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+        # Virtual Host Configuration
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+
+        proxy_buffering {{ buffering }};
+        uwsgi_buffering {{ buffering }};
+}

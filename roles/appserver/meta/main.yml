@@ -1,0 +1,21 @@
+---
+dependencies:
+  - { role: python-env, python_version: 3.5 }
+  - { role: node-env, node_version: "6.x" }
+  - {
+      role: git-project,
+      git_repo_address: "git@bitbucket.org:example/example.git",
+      git_repo_dest: "{{ project_dir }}",
+      git_branch_name: master
+    }
+  - { role: awscli }
+  - { 
+      role: nginx,
+      nginx_proxied: True,
+      nginx_sites: [
+        {
+          nginx_site_file_template: example-site.j2,
+          file_name: example
+        }
+      ]
+    }

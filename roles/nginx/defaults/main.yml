@@ -1,0 +1,13 @@
+---
+nginx_worker_processes: 4
+nginx_worker_connections: 2048
+nginx_keepalive_timeout: 65
+buffering: "on" # must be in quotes, else YAML evaluates to True
+gzip: "on" # must be in quotes, else YAML evaluates to True
+nginx_conf_file_template: nginx.conf.j2
+nginx_passwd_file_template: passwd.j2
+nginx_sites:
+  - nginx_site_file_template: site.j2
+    file_name: default
+nginx_htpasswd_abs_path: /etc/nginx/.htpasswd
+nginx_conf_abs_path: /etc/nginx/nginx.conf

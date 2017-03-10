@@ -1,0 +1,12 @@
+---
+# Playbooks utilizing this role should use an IAM role with the desired permissions
+- name: Install awscli through pip
+  pip: name=awscli version={{ awscli_version }}
+
+- name: Create aws directory if region is specified
+  file: path=/home/ubuntu/.aws state=directory
+  when: aws_region is defined
+
+- name: Install awsconfig file if region is specified
+  template: src=config.j2 dest=/home/ubuntu/.aws/config
+  when: aws_region is defined

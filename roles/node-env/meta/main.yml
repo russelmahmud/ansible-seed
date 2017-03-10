@@ -1,0 +1,10 @@
+---
+dependencies:
+  - role: geerlingguy.nodejs
+    ansible_user: ubuntu
+    nodejs_version: "{{ node_version }}"
+    nodejs_npm_global_packages:
+      - name: npm
+      - name: grunt-cli
+      - name: bower
+      - name: gulp

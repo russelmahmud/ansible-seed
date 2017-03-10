@@ -1,0 +1,37 @@
+- name: "Installing git-core"
+  apt: state=installed name=git-core
+
+- name: Create system gitconfig
+  copy: "dest=/etc/gitconfig content='[User]\n' force=no"
+
+- name: "Setting git system user.name"
+  lineinfile:
+    dest: /etc/gitconfig
+    line: name = git-bot
+    regexp: '\s*name\s*='
+    insertafter: '\[User\]'
+
+- name: "Setting git system user.email 'git-deploy@example.com'"
+  lineinfile:
+    dest: /etc/gitconfig
+    line: email = git-deploy@example.com
+    regexp: '\s*email\s*='
+    insertafter: 'name ='
+
+- name: "Create /home/ubuntu/.ssh directory"
+  file: state=directory path=/home/ubuntu/.ssh
+
+- name: "Copy git-bot private key file to /home/ubuntu/.ssh/"
+  copy: src=id_rsa dest=/home/ubuntu/.ssh/id_rsa mode=0600 owner=ubuntu group=ubuntu
+
+- name: "Copy git ingauge-git-bot public key file /home/ubuntu/.ssh/"
+  copy: src=id_rsa.pub dest=/home/ubuntu/.ssh/id_rsa.pub mode=0644
+
+- name: "Copy github config file to /home/ubuntu/.ssh/config"
+  template: src=config dest=/home/ubuntu/.ssh/config mode=0654 owner=ubuntu group=ubuntu
+
+- name: "Create /root/.ssh directory"
+  file: state=directory path=/root/.ssh
+
+- name: "Copy github config to /root/.ssh/config"
+  template: src=config dest=/root/.ssh/config mode=0654 owner=root group=root

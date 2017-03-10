@@ -1,0 +1,37 @@
+# python_version is a given variable, eg. `3.5`
+- name: Check if python is already latest
+  command: python3 --version
+  register: python_version_result
+  failed_when: "{{ python_version_result.stdout | replace('Python ', '') | version_compare(python_version, '>=') }}"
+
+- name: Install prerequisites
+  apt: name=python-software-properties state=present
+  become: true
+
+- name: Add deadsnakes repo
+  apt_repository: repo="ppa:fkrull/deadsnakes"
+  become: true
+
+- name: Install python
+  apt: name=python{{ python_version }} state=present
+  become: true
+
+- name: Install python-dev
+  apt: name="python{{ python_version }}-dev" state=present
+  become: true
+
+- name: Install pip - pt. 1
+  copy: src=get-pip.py dest=/usr/share/python/get-pip.py
+
+- name: Install pip - pt. 2
+  shell: "python{{python_version}} /usr/share/python/get-pip.py creates={{python_pkg_bin}}/pip{{python_version}}"
+  become: true
+
+- name: Install pip - pt. 3
+  shell: "python2.7 /usr/share/python/get-pip.py creates={{python_pkg_bin}}/pip2.7"
+  become: true
+
+- name: Update tools
+  pip: name="setuptools virtualenv" state=latest executable={{python_pkg_bin}}/pip{{python_version}}
+  environment:
+    PATH: "/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin"
